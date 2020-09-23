@@ -3,22 +3,33 @@
 <!-- for some information on what you could do (e.g. targets to override). -->
 <!-- If you delete this file and reopen the project it will be recreated. -->
 <project name="de.nigjo.nbm.office.filetypes" default="netbeans" basedir=".">
-    <description>Builds, tests, and runs the project de.nigjo.nbm.office.filetypes.</description>
-    <import file="nbproject/build-impl.xml"/>
-    <target name="init-keypass" depends="init">
-      <condition property="keypass.exist">
-        <available file="${keystore}" />
-      </condition>
-    </target>
-    <target name="makekeypass" depends="init,init-keypass" unless="keypass.exist"
-      description="to run this target, edit ${storepass} in private.properties">
-      <fail unless="storepass">No value for $${storepass}. Add this to your private.properties file.</fail>
-      <genkey alias="${nbm_alias}" dname="${keystore.dname}"
-        keystore="${keystore}" storepass="${storepass}"
-      />
-    </target>
-    <target name="clean" depends="projectized-common.clean">
-      <delete file="${keystore}"/>
-    </target>
-    <target name="nbm" depends="makekeypass,projectized-common.nbm"/>
+  <description>Builds, tests, and runs the project de.nigjo.nbm.office.filetypes.</description>
+  <import file="nbproject/build-impl.xml"/>
+  <target name="init-keypass" depends="init">
+    <!-- a ${keystore} file must be set in your private.properties -->
+    <condition property="keypass.exist">
+      <or>
+        <not>
+          <isset property="keystore"/>
+        </not>
+        <available file="${keystore}" />          
+      </or>
+    </condition>
+  </target>
+  <target name="makekeypass" depends="init,init-keypass" unless="keypass.exist"
+          description="to run this target, edit ${storepass} in private.properties">
+    <fail unless="storepass">No value for $${storepass}. Add a value to your private.properties file.</fail>
+    <!--
+keystore=nbproject/private/project.ks
+keystore.dname=CN=${user.name},C=${user.country}
+storepass=Any-Secret_Phrase
+nbm_alias=${ant.project.name}
+      -->
+    <property name="nbm_alias" value="${ant.project.name}"/>
+    <property name="keystore.dname" value="CN=${user.name},C=${user.country}"/>
+    <genkey alias="${nbm_alias}" dname="${keystore.dname}"
+            keystore="${keystore}" storepass="${storepass}"
+    />
+  </target>
+  <target name="nbm" depends="makekeypass,projectized-common.nbm"/>
 </project>
